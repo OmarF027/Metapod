@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulazione di Battaglia Pokémon - Metapod vs Metapod</title>
+    <!-- Aggiungi il link a Bootstrap -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f9f9f9;
+            padding-top: 20px;
+        }
+
+        .battle-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .pokemon-container {
+            text-align: center;
+        }
+
+        .pokemon img {
+            width: 150px;
+            height: 150px;
+            transition: transform 0.5s;
+        }
+
+        .pokemon img.reverse {
+            transform: scaleX(-1); /* Specchiatura dell'immagine */
+        }
+
+        .hp-bar {
+            width: 100%;
+            background-color: #ccc;
+            margin-top: 10px;
+        }
+
+        .hp {
+            height: 15px;
+            background-color: green;
+        }
+
+        .action-buttons {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .action-buttons button {
+            margin: 5px;
+        }
+
+        .log {
+            margin-top: 20px;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .log ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .log li {
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .boosted {
+            background-color: yellow;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 class="text-center">Battaglia Metapod vs Metapod</h1>
+
+    <div class="battle-container">
+        <!-- Metapod 1 -->
+        <div class="pokemon-container" id="metapod1">
+            <h2>Metapod 1</h2>
+            <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/11.png" alt="Metapod" id="metapod1-img">
+            <div class="hp-bar">
+                <div id="metapod1-hp" class="hp" style="width: 100%"></div>
+            </div>
+        </div>
+
+        <!-- Metapod 2 -->
+        <div class="pokemon-container" id="metapod2">
+            <h2>Metapod 2</h2>
+            <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/11.png" alt="Metapod" id="metapod2-img" class="reverse">
+            <div class="hp-bar">
+                <div id="metapod2-hp" class="hp" style="width: 100%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottone Azioni -->
+    <div class="action-buttons">
+        <button class="btn btn-primary" onclick="attacca('metapod1', 'azione')">Metapod 1 attacca con Azione!</button>
+        <button class="btn btn-warning" onclick="attacca('metapod1', 'rafforzatore')">Metapod 1 usa Rafforzatore!</button>
+        <button class="btn btn-primary" onclick="attacca('metapod2', 'azione')">Metapod 2 attacca con Azione!</button>
+        <button class="btn btn-warning" onclick="attacca('metapod2', 'rafforzatore')">Metapod 2 usa Rafforzatore!</button>
+    </div>
+
+    <!-- Log della battaglia -->
+    <div class="log">
+        <h4>Log della Battaglia</h4>
+        <ul id="battle-log">
+            <!-- I log delle azioni verranno aggiunti qui -->
+        </ul>
+    </div>
+</div>
+
+<!-- Aggiungi il link a Bootstrap e il codice JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    let metapod1 = { hp: 100, attacco: 10, difesa: 1, stato: 'normale' };  // Metapod 1
+    let metapod2 = { hp: 100, attacco: 10, difesa: 1, stato: 'normale' };  // Metapod 2
+
+    function calcolaDanno(attacco, difesa) {
+        return Math.max(1, attacco - difesa);  // Assicura che il danno non sia mai negativo
+    }
+
+    function attacca(pokemonAttaccante, mossa) {
+        let danno;
+        let pokemon = pokemonAttaccante === 'metapod1' ? metapod1 : metapod2;
+        let avversario = pokemonAttaccante === 'metapod1' ? metapod2 : metapod1;
+
+        let logMessage = '';
+        if (mossa === 'azione') {
+            danno = calcolaDanno(pokemon.attacco, avversario.difesa);
+            avversario.hp -= danno;
+            document.getElementById(pokemonAttaccante === 'metapod1' ? 'metapod2-hp' : 'metapod1-hp').style.width = (avversario.hp > 0 ? avversario.hp : 0) + '%';
+            logMessage = `${pokemonAttaccante === 'metapod1' ? 'Metapod 1' : 'Metapod 2'} ha attaccato con Azione! Danno: ${danno}`;
+        } else if (mossa === 'rafforzatore') {
+            pokemon.difesa += 2;  // Aumenta la difesa di Metapod di 2
+            pokemon.stato = 'rafforzato';
+            logMessage = `${pokemonAttaccante === 'metapod1' ? 'Metapod 1' : 'Metapod 2'} ha usato Rafforzatore! La difesa è aumentata!`;
+            document.getElementById(pokemonAttaccante === 'metapod1' ? 'metapod1' : 'metapod2').classList.add('boosted');
+            setTimeout(() => {
+                document.getElementById(pokemonAttaccante === 'metapod1' ? 'metapod1' : 'metapod2').classList.remove('boosted');
+            }, 1000);
+        }
+
+        // Aggiungi il log alla battaglia
+        let logList = document.getElementById('battle-log');
+        let logEntry = document.createElement('li');
+        logEntry.textContent = logMessage;
+        logList.appendChild(logEntry);
+
+        // Controllo se uno dei Metapod è stato sconfitto
+        if (punchline(metapod1.hp, 'Metapod 1')) return;
+        if (punchline(metapod2.hp, 'Metapod 2')) return;
+    }
+
+    function punchline(health, nome) {
+        if (health <= 0) {
+            alert(`${nome} è stato sconfitto!`);
+            return true;
+        }
+        return false;
+    }
+</script>
+
+</body>
+</html>
